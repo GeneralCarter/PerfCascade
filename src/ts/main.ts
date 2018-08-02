@@ -6,6 +6,7 @@ import * as HarTransformer from "./transformers/har";
 import { ChartOptions, ChartRenderOption, HarTransformerOptions } from "./typing/options";
 import { WaterfallDocs } from "./typing/waterfall";
 import { createWaterfallSvg } from "./waterfall/svg-chart";
+import { TimelineData } from "./typing/timeline-data";
 
 /** default options to use if not set in `options` parameter */
 const defaultChartOptions: Readonly<ChartOptions> = {
@@ -79,6 +80,20 @@ export function fromHar(harData: Har, options: ChartOptions = {}): SVGSVGElement
     ...options,
   };
   const data = HarTransformer.transformDoc(harData, harTransformerOptions);
+  if (typeof options.onParsed === "function") {
+    options.onParsed(data);
+  }
+  return PerfCascade(data, options);
+}
+
+/**
+ * Create new PerfCascade from Perf Timeline API data
+ * @param  {PTL} TimelineData - PTL object
+ * @param  {ChartOptions} options - PerfCascade options object
+ * @returns {SVGSVGElement} - Chart SVG Element
+ */
+export function fromTimelineAPI(PTLData: TimelineData, options: ChartOptions = {}): SVGSVGElement {
+  const data = PTLTransformer.transformDoc(PTLData);
   if (typeof options.onParsed === "function") {
     options.onParsed(data);
   }

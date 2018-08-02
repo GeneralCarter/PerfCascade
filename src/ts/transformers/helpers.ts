@@ -84,6 +84,21 @@ export function mimeToRequestType(mimeType: string): RequestType {
   }
 }
 
+export function initiatorToRequestType(initiatorType: string): RequestType {
+  if (initiatorType === undefined) {
+    return "other";
+  }
+  switch (initiatorType) {
+    case "css":
+    case "link": return "css";
+    case "":
+    case "navigator": return "html";
+    case "script":
+    case "json": return "javascript";
+    default: return "other";
+  }
+}
+
 /** helper to create a `WaterfallEntry` */
 export function createWaterfallEntry(url: string,
                                      start: number,

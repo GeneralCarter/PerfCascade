@@ -19,6 +19,11 @@
 <body>
 
     <div id="legendHolder"></div>
+    <h1>Timing API JSON</h1>
+    <input type="file" id="fileinput3" />
+    <select id="page-selector3" class="page-selector"></select>
+    <div id="output3" class="output"></div>
+
     <h1>Chrome HAR</h1> <input type="file" id="fileinput" />
     <select id="page-selector" class="page-selector"></select>
     <div id="output" class="output"></div>
@@ -47,6 +52,8 @@
             var pageSelectorEl = document.getElementById("page-selector")
             var outputHolder2El = document.getElementById("output2")
             var pageSelector2El = document.getElementById("page-selector2")
+            var outputHolder3El = document.getElementById("output3")
+            var pageSelector3El = document.getElementById("page-selector3")
             var legendHolderEl = document.getElementById("legendHolder")
 
             function setup(options, fileinputId, outputHolder, harUrl) {
@@ -61,7 +68,8 @@
                     }
 
                     /** pass HAR and options to `newPerfCascadeHar` to generate the SVG element*/
-                    var perfCascadeSvg = perfCascade.fromHar(logData, options)
+                    var perfCascadeSvg = options.fromTimelineAPI ? perfCascade.fromHar(logData, options) : perfCascade.fromHar(logData, options);
+
 
                     /** append SVG to page - that's it */
                     outputHolder.appendChild(perfCascadeSvg)
@@ -113,6 +121,11 @@
                     showMimeTypeIcon: false,
                     showIndicatorIcons: false,
                 }, "fileinput2", outputHolder2El, "test-data/wpt_github.com.151226_X7_b43d35e592fab70e0ba012fe11a41020.har");
+            setup({
+                    pageSelector: pageSelector3El,
+                    showUserTiming: true,
+                    fromTimelineAPI: true,
+                }, "fileinput3", outputHolder3El, "test-data/wpt_github.com.151226_X7_b43d35e592fab70e0ba012fe11a41020.har");
         })(window.perfCascade)
     </script>
 </body>
