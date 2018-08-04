@@ -30,8 +30,8 @@ function parseGeneralDetails(entry: PerformanceResourceTiming): SafeKvTuple[] {
 function parseTimings(entry: PerformanceResourceTiming, timings: WaterfallEntryTiming[]): SafeKvTuple[] {
   return ([
     ["Total", formatMilliseconds(entry.duration)],
-    ["Blocked", optionalTiming(timings.)],
-    ["DNS", optionalTiming(timings.dns)],
+    ["Blocked", formatMilliseconds(entry.requestStart - entry.startTime)],
+    ["DNS", optionalTiming(entry.domainLookupEnd - entry.domainLookupStart)],
     ["Connect", connectVal],
     ["SSL (TLS)", optionalTiming(timings.ssl)],
     ["Send", formatMilliseconds(timings.send)],
