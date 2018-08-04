@@ -1,9 +1,9 @@
 import { TimelineData } from "../typing/timeline-data";
 import { WaterfallDocs, WaterfallData, RequestType, WaterfallResponseDetails, TimingType, WaterfallEntryTiming } from "../typing/waterfall";
-import { toInt, escapeHtml, sanitizeAlphaNumeric } from "../helpers/parse";
+import { escapeHtml, sanitizeAlphaNumeric } from "../helpers/parse";
 import { initiatorToRequestType, createWaterfallEntry, createWaterfallEntryTiming } from "./helpers";
 import { makeIcon } from "../waterfall/row/svg-indicators";
-import { timingTypeToCssClass } from "./styling-converters";
+import { makeTabs } from "./timeline-tabs";
 
 
 /**
@@ -51,12 +51,13 @@ function toWaterFallEntry(entry: PerformanceResourceTiming, index: number, start
   const endRelative = Math.round(startRelative + entry.duration);
   const requestType = initiatorToRequestType(entry.initiatorType);
   const responseDetails = createResponseDetails(requestType);
+  const waterfallTiming = buildDetailTimingBlocks(entry);
   return createWaterfallEntry(entry.name,
     startRelative,
     endRelative,
-    buildDetailTimingBlocks(entry),
+    waterfallTiming,
     responseDetails,
-    makeTabs(entry, (index + 1), requestType, startRelative, endRelative, []),
+    makeTabs(entry, waterfallTiming),
   );
 }
 
