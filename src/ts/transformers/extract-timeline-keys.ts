@@ -1,5 +1,5 @@
-import { SafeKvTuple, KvTuple, WaterfallEntryTiming } from "../typing/waterfall";
-import { formatMilliseconds, parseAndFormat } from "../helpers/parse";
+import { SafeKvTuple, KvTuple } from "../typing/waterfall";
+import { formatMilliseconds } from "../helpers/parse";
 
 /** Predicate to filter out invalid or empty `KvTuple` */
 const notEmpty = (kv: KvTuple) => {
@@ -11,31 +11,30 @@ const notEmpty = (kv: KvTuple) => {
  * @param  {number} requestID - request number
  * @param  {WaterfallEntry} entry
  */
-export function getKeys(entry: PerformanceResourceTiming, timings: WaterfallEntryTiming[]) {
+export function getKeys(entry: PerformanceResourceTiming) {
   return {
     general: parseGeneralDetails(entry),
-    timings: parseTimings(entry, timings),
+    timings: parseTimings(entry),
   };
 }
-
 
 function parseGeneralDetails(entry: PerformanceResourceTiming): SafeKvTuple[] {
   return ([
     ["Name", entry.name],
     ["Initiator Type", entry.initiatorType],
-    ["Duration", formatMilliseconds(entry.duration)]
+    ["Duration", formatMilliseconds(entry.duration)],
   ] as KvTuple[]).filter(notEmpty) as SafeKvTuple[];
 }
 
-function parseTimings(entry: PerformanceResourceTiming, timings: WaterfallEntryTiming[]): SafeKvTuple[] {
+function parseTimings(entry: PerformanceResourceTiming): SafeKvTuple[] {
   return ([
     ["Total", formatMilliseconds(entry.duration)],
     ["Blocked", formatMilliseconds(entry.requestStart - entry.startTime)],
-    ["DNS", optionalTiming(entry.domainLookupEnd - entry.domainLookupStart)],
-    ["Connect", connectVal],
-    ["SSL (TLS)", optionalTiming(timings.ssl)],
-    ["Send", formatMilliseconds(timings.send)],
-    ["Wait", formatMilliseconds(timings.wait)],
-    ["Receive", formatMilliseconds(timings.receive)],
+    ["DNS", formatMilliseconds(entry.domainLookupEnd - entry.domainLookupStart)],
+    ["Connect", formatMilliseconds(entry.connectEnd - entry.connectStart)],
+    ["SSL (TLS)", formatMilliseconds(0)],
+    ["Send", formatMilliseconds(entry.connectEnd - entry.requestStart)],
+    ["Wait", formatMilliseconds(entry.responseStart - entry.requestStart)],
+    ["Receive", formatMilliseconds(entry.responseEnd - entry.responseStart)],
   ] as KvTuple[]).filter(notEmpty) as SafeKvTuple[];
 }

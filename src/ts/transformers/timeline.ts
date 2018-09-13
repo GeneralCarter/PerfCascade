@@ -1,7 +1,7 @@
 import { TimelineData } from "../typing/timeline-data";
-import { WaterfallDocs, WaterfallData, RequestType, WaterfallResponseDetails, TimingType, WaterfallEntryTiming } from "../typing/waterfall";
+import { RequestType, TimingType, WaterfallDocs, WaterfallData, UserTiming,  WaterfallEntryTiming, WaterfallResponseDetails } from "../typing/waterfall";
 import { escapeHtml, sanitizeAlphaNumeric } from "../helpers/parse";
-import { initiatorToRequestType, createWaterfallEntry, createWaterfallEntryTiming } from "./helpers";
+import { createWaterfallEntry, createWaterfallEntryTiming, initiatorToRequestType } from "./helpers";
 import { makeIcon } from "../waterfall/row/svg-indicators";
 import { makeTabs } from "./timeline-tabs";
 
@@ -32,11 +32,20 @@ export function transformPage(data: TimelineData): WaterfallData {
 
   const entries = data.filter((entry) => {
     return entry.entryType === "resource";
-  }).map((entry, index) => {
+  }).map((entry) => {
     const startRelative = new Date(entry.startTime).getTime() - pageStartTime;
     doneTime = Math.max(doneTime, startRelative + entry.duration);
-    return toWaterFallEntry(entry as PerformanceResourceTiming, index, startRelative)
+    return toWaterFallEntry(entry as PerformanceResourceTiming, startRelative)
   })
+
+  let marks = [] as UserTiming[];
+  return {
+    docIsTLS: true,
+    durationMs: doneTime,
+    entries,
+    marks,
+    title: "test",
+  };
 }
 
 /**
@@ -46,7 +55,7 @@ export function transformPage(data: TimelineData): WaterfallData {
  * @param  {number} index - resource entry index
  * @param  {number} startRelative - entry start time relative to the document in ms
  */
-function toWaterFallEntry(entry: PerformanceResourceTiming, index: number, startRelative: number) {
+function toWaterFallEntry(entry: PerformanceResourceTiming, startRelative: number) {
   startRelative = Math.round(startRelative);
   const endRelative = Math.round(startRelative + entry.duration);
   const requestType = initiatorToRequestType(entry.initiatorType);
@@ -57,7 +66,7 @@ function toWaterFallEntry(entry: PerformanceResourceTiming, index: number, start
     endRelative,
     waterfallTiming,
     responseDetails,
-    makeTabs(entry, waterfallTiming),
+    makeTabs(entry),
   );
 }
 
@@ -86,37 +95,37 @@ const getTimePair = (key: TimingType, entry: PerformanceResourceTiming) => {
     case "blocked":
       return {
         end: Math.round(entry.requestStart),
-        start: Math.round(entry.startTime)
+        start: Math.round(entry.startTime),
       };
     case "dns":
       return {
         end: Math.round(entry.domainLookupEnd),
-        start: Math.round(entry.domainLookupStart)
+        start: Math.round(entry.domainLookupStart),
       };
     case "connect":
       return {
         end: Math.round(entry.connectEnd),
-        start: Math.round(entry.connectStart)
+        start: Math.round(entry.connectStart),
       };
     case "send":
       return {
         end: Math.round(0),
-        start: Math.round(0)
+        start: Math.round(0),
       };
     case "wait":
       return {
         end: Math.round(entry.responseStart),
-        start: Math.round(entry.requestStart)
+        start: Math.round(entry.requestStart),
       };
     case "receive":
       return {
         end: Math.round(entry.responseEnd),
-        start: Math.round(entry.responseStart)
+        start: Math.round(entry.responseStart),
       };
     default:
       return {
         end: Math.round(0),
-        start: Math.round(0)
+        start: Math.round(0),
       };
   }
 };

@@ -3,6 +3,7 @@ import { validateOptions } from "./helpers/parse";
 import { makeLegend as makeLegendInternal } from "./legend/legend";
 import Paging from "./paging/paging";
 import * as HarTransformer from "./transformers/har";
+import * as PTLTransformer from "./transformers/timeline";
 import { ChartOptions, ChartRenderOption, HarTransformerOptions } from "./typing/options";
 import { WaterfallDocs } from "./typing/waterfall";
 import { createWaterfallSvg } from "./waterfall/svg-chart";

@@ -68,7 +68,7 @@
                     }
 
                     /** pass HAR and options to `newPerfCascadeHar` to generate the SVG element*/
-                    var perfCascadeSvg = options.fromTimelineAPI ? perfCascade.fromHar(logData, options) : perfCascade.fromHar(logData, options);
+                    var perfCascadeSvg = options.fromTimelineAPI ? perfCascade.fromTimelineAPI(logData, options) : perfCascade.fromHar(logData, options);
 
 
                     /** append SVG to page - that's it */
@@ -98,7 +98,7 @@
 
                 if (window["fetch"]) {/** load an initial HAR when opening the page */
                     window["fetch"](harUrl)
-                        .then(f => f.json().then(j => renderPerfCascadeChart(j.log)))
+                        .then(f => f.json().then(j => renderPerfCascadeChart(j.log ? j.log : j)))
                 }
 
                 /** hook up file input events */
@@ -125,7 +125,7 @@
                     pageSelector: pageSelector3El,
                     showUserTiming: true,
                     fromTimelineAPI: true,
-                }, "fileinput3", outputHolder3El, "test-data/wpt_github.com.151226_X7_b43d35e592fab70e0ba012fe11a41020.har");
+                }, "fileinput3", outputHolder3El, "test-data/chrome_enorm-magazin.de.json");
         })(window.perfCascade)
     </script>
 </body>
